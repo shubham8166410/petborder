@@ -1,0 +1,65 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { TimelineForm } from "@/components/timeline/TimelineForm";
+import { Header } from "@/components/layout/Header";
+import { PawPrint } from "@/components/icons/PawPrint";
+
+export const metadata: Metadata = {
+  title: "Generate Your Pet Travel Timeline",
+  description:
+    "Enter your pet's details and travel plans to get a personalised DAFF compliance timeline for bringing your pet to Australia.",
+};
+
+export default function GeneratePage() {
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Header />
+
+      <main className="flex-1 px-4 py-8 sm:py-12">
+        <div className="max-w-2xl mx-auto">
+          {/* Page intro */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-50 mb-4">
+              <PawPrint className="w-7 h-7 text-brand-600" aria-hidden="true" />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Get your pet's compliance timeline
+            </h1>
+            <p className="text-sm text-gray-500 mt-1.5 max-w-sm mx-auto">
+              Answer 3 quick questions — we'll calculate every DAFF step, date, and cost for you.
+            </p>
+          </div>
+
+          {/* Form card */}
+          <div className="bg-white border border-card-border rounded-2xl p-6 sm:p-8 shadow-sm">
+            <TimelineForm />
+          </div>
+
+          {/* Back link */}
+          <div className="mt-6 text-center">
+            <Link
+              href="/"
+              className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              ← Back to home
+            </Link>
+          </div>
+        </div>
+      </main>
+
+      {/* Minimal footer */}
+      <footer className="border-t border-card-border px-4 py-4 text-center text-xs text-gray-400">
+        For planning purposes only. Always confirm requirements with{" "}
+        <a
+          href="https://www.agriculture.gov.au/biosecurity-trade/cats-dogs"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-gray-600"
+        >
+          DAFF
+        </a>{" "}
+        before booking travel for your pet.
+      </footer>
+    </div>
+  );
+}
