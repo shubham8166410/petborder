@@ -1,37 +1,42 @@
 # ClearPaws
 
-AI-powered pet travel compliance planner for Australia. Enter where you're moving from, when you want to travel, and what pet you have — get a personalised step-by-step DAFF compliance timeline with exact dates, cost estimates, and a downloadable checklist.
+ClearPaws is an AI-powered pet travel compliance planner for Australia. Pet owners enter three things — where they are moving from, when they want to travel, and what pet they have — and receive a personalised step-by-step DAFF compliance timeline with exact dates, real cost estimates, and every requirement written in plain English. The product runs across four phases: a free timeline generator, paid accounts and document packs, a subscription tier with premium features, and a B2B white-label platform for pet transport agencies.
 
-**Live:** [clearpaws.com.au](https://clearpaws.com.au)
+**Live site:** [clearpaws.com.au](https://clearpaws.com.au)
+**Vercel dashboard:** [vercel.com/dashboard](https://vercel.com/dashboard)
+**Supabase dashboard:** [supabase.com/dashboard](https://supabase.com/dashboard)
 
 ---
 
 ## Tech stack
 
 | Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 16 (App Router) |
-| Language | TypeScript (strict) |
+|---|---|
+| Framework | Next.js 16 (App Router, Turbopack) |
+| Language | TypeScript (strict mode, no `any`) |
 | Styling | Tailwind CSS v4 |
-| Database & Auth | Supabase (PostgreSQL + RLS) |
-| AI | Anthropic Claude API |
-| Payments | Stripe (one-time + subscription) |
+| Database | Supabase (PostgreSQL) |
+| Auth | Supabase Auth (email/password + Google OAuth) |
+| AI | Anthropic Claude API (`claude-sonnet-4-20250514`) |
+| Payments | Stripe (one-time + recurring subscriptions) |
 | Email | Resend |
-| PDF | @react-pdf/renderer (server-side) |
-| Deployment | Vercel |
+| PDF | `@react-pdf/renderer` (server-side only) |
+| Validation | Zod v4 on all API routes |
 | Testing | Vitest + happy-dom |
+| Deployment | Vercel (with cron jobs) |
+| Routing middleware | `src/proxy.ts` (Next.js 16 proxy convention) |
 
 ---
 
-## Getting started
+## Running locally
 
 ### Prerequisites
 
-- Node.js 20+
-- A [Supabase](https://supabase.com) project
+- Node.js 20 or higher
+- A [Supabase](https://supabase.com) project (free tier is fine)
 - An [Anthropic](https://console.anthropic.com) API key
-- A [Stripe](https://stripe.com) account (test mode is fine locally)
-- A [Resend](https://resend.com) account (for email)
+- A [Stripe](https://stripe.com) account in test mode
+- A [Resend](https://resend.com) account
 
 ### 1. Clone and install
 
@@ -41,30 +46,41 @@ cd clearpaws
 npm install
 ```
 
-### 2. Set up environment variables
+### 2. Configure environment variables
 
 ```bash
 cp .env.production.example .env.local
 ```
 
-Open `.env.local` and fill in all values. See the comments in that file for where to find each one.
+Open `.env.local` and fill in every value. The file has comments explaining where to find each one. All variables are required for full functionality — see the [Environment variables](#environment-variables) section below.
 
-### 3. Set up the database
+### 3. Apply database migrations
 
-Apply migrations in order using the Supabase dashboard SQL editor or the CLI:
+Open the Supabase dashboard for your project, go to the SQL Editor, and run each migration file in order:
 
-```bash
-# With Supabase CLI
-supabase db push
-
-# Or apply manually in order:
-# supabase/migrations/001_phase2_schema.sql
-# supabase/migrations/002_phase3_schema.sql
-# supabase/migrations/003_phase4_schema.sql
-# supabase/migrations/004_daff_monitoring.sql
+```
+supabase/migrations/001_phase2_schema.sql
+supabase/migrations/002_phase3_schema.sql
+supabase/migrations/003_phase4_schema.sql
+supabase/migrations/004_daff_monitoring.sql
 ```
 
-### 4. Run locally
+Alternatively, with the Supabase CLI:
+
+```bash
+supabase db push
+```
+
+### 4. Configure Supabase Auth
+
+In your Supabase dashboard → Authentication → URL Configuration:
+
+- **Site URL:** `http://localhost:3000`
+- **Redirect URLs:** add `http://localhost:3000/auth/callback`
+
+To enable Google OAuth: Authentication → Providers → Google → enable and add your Client ID and Secret from [Google Cloud Console](https://console.cloud.google.com).
+
+### 5. Start the development server
 
 ```bash
 npm run dev
@@ -74,134 +90,186 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
+## Environment variables
+
+All variables are required in production. Copy `.env.production.example` to `.env.local` and fill in each value.
+
+| Variable | Used for |
+|---|---|
+| `ANTHROPIC_API_KEY` | Claude API — timeline generation |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL (safe to expose) |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key (safe to expose) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-only admin operations — never expose to browser |
+| `STRIPE_SECRET_KEY` | Stripe payments — server-side only |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key (safe to expose) |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signature verification |
+| `STRIPE_PRICE_ID` | Price ID for the $49 AUD one-time document pack |
+| `STRIPE_SUBSCRIPTION_PRICE_ID` | Price ID for the $9.90 AUD/month subscription |
+| `B2B_STRIPE_PRICE_ID` | Price ID for the $299 AUD/month agency portal |
+| `RESEND_API_KEY` | Transactional email — deadline reminders and DAFF alerts |
+| `NEXT_PUBLIC_BASE_DOMAIN` | Production domain, e.g. `clearpaws.com.au` |
+| `ADMIN_EMAIL` | Receives DAFF rule-change alerts and vet registration notifications |
+| `CRON_SECRET` | Secures cron endpoints — generate with `openssl rand -hex 32` |
+
+---
+
+## Running tests
+
+```bash
+# Run all unit tests
+npm test
+
+# Run tests with coverage report
+npm run test:coverage
+
+# Run tests in watch mode
+npm run test:watch
+```
+
+Tests live in `__tests__/` and are organised to mirror the source structure. Coverage thresholds are set to 80% lines, functions, and branches in `vitest.config.ts`. Key test files:
+
+- `__tests__/lib/daff-rules.test.ts` — regression guards for DAFF compliance rules (rnattWaitDays, quarantine days, breed bans)
+- `__tests__/lib/timeline-schema.test.ts` — Zod validation for timeline input/output
+- `__tests__/api/` — API route tests using mock Supabase clients
+
+---
+
+## Deploying
+
+### Vercel (recommended)
+
+1. Push to the `main` branch — Vercel deploys automatically.
+2. Add all environment variables in Vercel → Project → Settings → Environment Variables.
+3. Set Stripe webhook endpoint to `https://clearpaws.com.au/api/webhook/stripe` — copy the signing secret to `STRIPE_WEBHOOK_SECRET`.
+4. Vercel activates the cron jobs in `vercel.json` automatically in production.
+
+### Manual production build
+
+```bash
+npm run build   # must pass before pushing
+npm run start   # preview production build locally
+```
+
+### Cron jobs
+
+Configured in `vercel.json` and secured by `CRON_SECRET`:
+
+| Endpoint | Schedule | Purpose |
+|---|---|---|
+| `/api/cron/reminders` | Daily 9am UTC | Emails users whose compliance steps are due within 14 days |
+| `/api/cron/daff-scrape` | Sunday 11pm UTC | Scrapes DAFF pages, detects content changes, emails admin alert |
+
+---
+
 ## Project structure
 
 ```
-src/
-├── app/
-│   ├── (marketing)/        # Landing page
-│   ├── admin/              # Admin dashboard (role-gated)
-│   ├── agency-portal/      # B2B agency lead dashboard
-│   ├── api/                # All API routes
-│   │   ├── generate-timeline/  # Core AI timeline endpoint
-│   │   ├── checkout/           # Stripe one-time payment
-│   │   ├── subscription/       # Stripe recurring billing
-│   │   ├── webhook/stripe/     # Stripe webhook handler
-│   │   ├── cron/               # Scheduled jobs (reminders, DAFF scraper)
-│   │   ├── v1/                 # Public REST API (API key auth)
-│   │   └── ...
-│   ├── auth/               # OAuth callback handler
-│   ├── dashboard/          # User dashboard + saved timelines
-│   ├── generate/           # 3-step timeline generator form
-│   ├── login/ signup/      # Auth pages
-│   ├── vet-portal/         # Vet registration and client management
-│   └── wl/[slug]/          # White-label agency subpages
-├── components/
-│   ├── auth/               # Login and signup forms
-│   ├── dashboard/          # Dashboard components
-│   ├── layout/             # Header, Footer, NavigationProgress
-│   ├── timeline/           # Timeline form and result display
-│   └── ui/                 # Shared primitives (Button, Input, Alert)
-├── lib/
-│   ├── anthropic.ts        # Claude API client + system prompt
-│   ├── countries.ts        # DAFF country group classification
-│   ├── daff-rules.ts       # Hardcoded DAFF rules (Layer 1 accuracy)
-│   ├── stripe.ts           # Stripe client + price IDs
-│   ├── email.ts            # Resend email helpers
-│   └── supabase/           # Supabase client factories
-├── types/                  # TypeScript interfaces
-└── proxy.ts                # Next.js 16 routing middleware
-supabase/
-└── migrations/             # Ordered SQL migration files
-__tests__/                  # Vitest unit tests
+clearpaws/
+├── src/
+│   ├── app/
+│   │   ├── (marketing)/          # Landing page (unauthenticated)
+│   │   ├── admin/                # Admin dashboard — role-gated
+│   │   │   ├── acquisition/      # MRR, user growth, referral metrics
+│   │   │   ├── daff-monitor/     # Review detected DAFF rule changes
+│   │   │   ├── users/            # User management
+│   │   │   └── vets/             # Vet verification queue
+│   │   ├── agency-portal/        # B2B agency lead dashboard
+│   │   │   ├── leads/            # Lead table with inline status updates
+│   │   │   ├── api-keys/         # API key management
+│   │   │   └── settings/         # Branding — logo, colours, contact email
+│   │   ├── api/
+│   │   │   ├── generate-timeline/ # Core AI endpoint — rate limited 5/day/IP
+│   │   │   ├── timelines/         # CRUD + progress tracking + PDF
+│   │   │   ├── checkout/          # Stripe one-time $49 session
+│   │   │   ├── subscription/      # Stripe recurring billing + portal
+│   │   │   ├── webhook/stripe/    # Stripe webhook — signature verified
+│   │   │   ├── cron/              # Scheduled jobs (reminders, DAFF scraper)
+│   │   │   ├── admin/             # Admin-only API routes
+│   │   │   ├── v1/                # Public REST API (API key auth)
+│   │   │   ├── agency-leads/      # Lead pipeline for agency portal
+│   │   │   ├── agencies/          # Agency settings and click tracking
+│   │   │   ├── agency/checkout/   # Stripe B2B $299/mo session
+│   │   │   ├── api-keys/          # API key creation and management
+│   │   │   └── vet/               # Vet registration and step completion
+│   │   ├── auth/callback/        # OAuth code exchange, new user detection
+│   │   ├── dashboard/            # User dashboard — timelines, pets, finders
+│   │   ├── generate/             # 3-step timeline generator form
+│   │   ├── login/ signup/        # Auth pages
+│   │   ├── vet-portal/           # Vet registration and client management
+│   │   └── wl/[slug]/            # White-label subdomain pages
+│   ├── components/
+│   │   ├── auth/                 # LoginForm, SignupForm
+│   │   ├── dashboard/            # DashboardTimelines, WelcomeToast, ProgressTracker
+│   │   ├── layout/               # Header, Footer, NavigationProgress
+│   │   ├── timeline/             # TimelineForm, TimelineResult, TimelineStep
+│   │   ├── ui/                   # Button, Input, Alert, Select (shared primitives)
+│   │   └── whitelabel/           # AgencyBrandingProvider, LeadCaptureForm
+│   ├── lib/
+│   │   ├── anthropic.ts          # Claude client — injects daff-rules.ts as context
+│   │   ├── daff-rules.ts         # Hardcoded DAFF rules with source URLs (Layer 1)
+│   │   ├── daff-monitor.ts       # DAFF page scraper and hash comparison (Layer 2)
+│   │   ├── mickleham.ts          # Live quarantine availability with 24h cache (Layer 3)
+│   │   ├── countries.ts          # DAFF group classification for all origin countries
+│   │   ├── stripe.ts             # Stripe client and price ID constants
+│   │   ├── email.ts              # Resend deadline reminder email template
+│   │   ├── api-middleware.ts     # API key authentication for v1 endpoints
+│   │   ├── api-keys.ts           # bcrypt key hashing — raw keys never stored
+│   │   ├── rate-limit.ts         # IP-based rate limiting (5 req/day free tier)
+│   │   ├── sanitize.ts           # Input sanitisation before Claude API calls
+│   │   ├── subscription.ts       # User role and subscription status helpers
+│   │   ├── pdf/TimelinePdf.tsx   # @react-pdf/renderer template (server-side only)
+│   │   └── supabase/             # Server, client, and proxy Supabase factories
+│   ├── hooks/
+│   │   └── useSubscription.ts    # Client-side subscription status
+│   ├── types/                    # TypeScript interfaces for all phases
+│   └── proxy.ts                  # Next.js 16 routing middleware — subdomain handling
+├── supabase/
+│   └── migrations/               # SQL migrations — apply in order (001 → 004)
+├── __tests__/                    # Vitest unit tests mirroring src/ structure
+├── .env.production.example       # All required env vars with descriptions
+├── vercel.json                   # Cron job configuration
+└── vitest.config.ts              # Test configuration with 80% coverage threshold
 ```
 
 ---
 
-## Available scripts
+## Phase summary
 
-```bash
-npm run dev          # Start development server (Turbopack)
-npm run build        # Production build
-npm run start        # Start production server
-npm run lint         # ESLint
-npm test             # Run unit tests (Vitest)
-npm run test:coverage  # Run tests with coverage report
-```
+### Phase 1 — Timeline generator
+Free tool at `/generate`. Three-step form collects origin country, travel date, and pet details. Submits to `POST /api/generate-timeline` which validates input with Zod, injects the full DAFF rule set from `daff-rules.ts` as context, calls the Claude API, and returns a structured compliance timeline. Rate limited to 5 requests per IP per day. No account required.
 
----
+### Phase 2 — Accounts and payments
+Supabase Auth with email/password and Google OAuth. Users can save generated timelines to their account. A one-time $49 AUD Stripe payment unlocks a professional PDF document pack generated server-side with `@react-pdf/renderer`. Stripe webhook at `/api/webhook/stripe` writes purchase records after signature verification. Resend sends deadline reminder emails via a daily Vercel cron job.
 
-## Environment variables
+### Phase 3 — Subscription and premium features
+$9.90 AUD/month Stripe subscription gives users a progress tracker to tick off completed steps, multi-pet profile management, a map of DAFF-approved export vets filtered by state, a directory of RNATT-approved laboratories by country, and a comparison table of Petraveller, Dogtainers, and Jetpets with pricing and direct referral links.
 
-See `.env.production.example` for the full list with descriptions.
-
-| Variable | Required | Notes |
-|----------|----------|-------|
-| `ANTHROPIC_API_KEY` | Yes | Timeline generation |
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Public anon key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Server-only admin key |
-| `STRIPE_SECRET_KEY` | Yes | Payments |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Yes | Client-side Stripe |
-| `STRIPE_WEBHOOK_SECRET` | Yes | Webhook signature verification |
-| `STRIPE_PRICE_ID` | Yes | $49 AUD document pack |
-| `STRIPE_SUBSCRIPTION_PRICE_ID` | Yes | $9.90/mo subscription |
-| `B2B_STRIPE_PRICE_ID` | Yes | $299/mo agency portal |
-| `RESEND_API_KEY` | Yes | Deadline reminder emails |
-| `NEXT_PUBLIC_BASE_DOMAIN` | Yes | e.g. `clearpaws.com.au` |
-| `ADMIN_EMAIL` | Yes | DAFF alert recipient |
-| `CRON_SECRET` | Yes | Secures cron endpoints |
+### Phase 4 — B2B white-label platform
+Pet transport agencies pay $299 AUD/month for a white-label portal (`[slug].clearpaws.com.au`) where their customers use the timeline tool under the agency's branding. Agencies log in to `agency.clearpaws.com.au` to view leads, update statuses, export CSV, and manage API keys. A public REST API (`/api/v1`) allows agencies to integrate the timeline engine programmatically. Vets can register at `vet.clearpaws.com.au` and manage export clients. An admin dashboard tracks MRR, user growth, referral clicks, and API usage.
 
 ---
 
-## Key architectural decisions
+## Accuracy system
 
-**Accuracy system (three layers)**
+DAFF compliance information must be correct. ClearPaws uses three layers:
 
-1. **Hardcoded rules** — `src/lib/daff-rules.ts` contains all stable DAFF rules with source URLs. Claude is never asked to recall rules from training data — it receives the full rule set as context in every API call.
-2. **Weekly DAFF monitoring** — `GET /api/cron/daff-scrape` scrapes official DAFF pages, hashes content, and emails the admin if anything changes.
-3. **Live data** — Mickleham quarantine availability is fetched at query time and cached.
+**Layer 1 — Hardcoded knowledge base**
+All stable DAFF rules are stored in `src/lib/daff-rules.ts` with source URLs and verified dates. The Claude API is never asked to recall rules from training data. Every call to the AI includes the full rule set explicitly: *"Here are the current DAFF rules. Use only these rules. Do not add rules not listed here."*
 
-**API key authentication (public API)**
+**Layer 2 — Weekly monitoring**
+`GET /api/cron/daff-scrape` runs every Sunday. It fetches the official DAFF pages, hashes the content, compares against the previous snapshot in the `daff_snapshots` table, and emails the admin if any page has changed. No rule change goes live without human review.
 
-API keys are stored as bcrypt hashes — raw keys are never persisted. Keys are validated on every request via `src/lib/api-middleware.ts`.
-
-**White-label routing**
-
-Subdomains (`agency.clearpaws.com.au`, `vet.clearpaws.com.au`, `[slug].clearpaws.com.au`) are handled by `src/proxy.ts` which rewrites requests to the correct app route.
+**Layer 3 — Live data**
+Mickleham Post Entry Quarantine Facility availability is fetched at query time from the DAFF website and cached for 24 hours with a stale fallback.
 
 ---
 
-## Cron jobs (Vercel)
+## Security notes
 
-Configured in `vercel.json`:
-
-| Endpoint | Schedule | Purpose |
-|----------|----------|---------|
-| `/api/cron/reminders` | Daily 9am UTC | Email users with steps due in 14 days |
-| `/api/cron/daff-scrape` | Sunday 11pm UTC | Detect DAFF rule changes |
-
-Both endpoints require `Authorization: Bearer <CRON_SECRET>` — Vercel adds this automatically.
-
----
-
-## Deployment
-
-See `.env.production.example` for all required environment variables.
-
-```bash
-# Build passes locally before pushing
-npm run build
-
-# Deploy via Vercel (auto-deploys on push to main)
-git push origin main
-```
-
-Make sure the Stripe webhook endpoint is registered at:
-`https://clearpaws.com.au/api/webhook/stripe`
-
----
-
-## Disclaimer
-
-ClearPaws provides general guidance only. Always verify requirements with the [Australian Department of Agriculture, Fisheries and Forestry (DAFF)](https://www.agriculture.gov.au/biosecurity-trade/cats-dogs) before booking travel for your pet.
+- All API routes validate requests with Zod before any database or AI operation
+- Stripe webhook signature is verified on every request before writing to the database
+- API keys are bcrypt-hashed before storage — the raw key is shown once on creation and never stored
+- Supabase Row Level Security is enabled on all tables — users can only read and write their own rows
+- The Claude API key, Stripe secret key, and Supabase service role key are server-side only and never exposed to the browser
+- Cron endpoints require `Authorization: Bearer <CRON_SECRET>` to prevent unauthorised invocations
+- Origin validation on Stripe checkout routes prevents open-redirect attacks via crafted headers
