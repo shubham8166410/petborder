@@ -5,8 +5,13 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
-import { PawPrint } from "@/components/icons/PawPrint";
+import dynamic from "next/dynamic";
 import type { User } from "@supabase/supabase-js";
+
+const CatLoveLogo = dynamic(
+  () => import("@/components/icons/CatLoveLogo").then((m) => ({ default: m.CatLoveLogo })),
+  { ssr: false, loading: () => <span style={{ width: 36, height: 36, display: "inline-block" }} /> }
+);
 
 // ── Icons ──────────────────────────────────────────────────────────────────
 
@@ -58,8 +63,8 @@ function Toast({ message, visible }: ToastProps) {
 function AuthSkeleton() {
   return (
     <div className="flex items-center gap-3 animate-pulse" aria-hidden="true">
-      <div className="h-4 w-14 bg-gray-200 rounded-full" />
-      <div className="h-9 w-28 bg-gray-200 rounded-xl" />
+      <div className="h-8 w-16 bg-white/10 rounded-lg" />
+      <div className="h-9 w-28 bg-white/10 rounded-lg" />
     </div>
   );
 }
@@ -82,10 +87,10 @@ function NavLink({ href, children, isActive, prefersReduced }: NavLinkProps) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       className={[
-        "relative text-sm font-medium transition-colors duration-150 px-2 py-1 rounded-full whitespace-nowrap",
+        "relative text-sm font-medium transition-all duration-150 px-3 py-1.5 rounded-lg whitespace-nowrap",
         isActive
-          ? "text-brand-600 font-semibold bg-accent-50"
-          : "text-gray-600 hover:text-brand-600",
+          ? "text-white font-semibold bg-accent-500/20"
+          : "text-white/70 hover:text-white hover:bg-white/8",
       ].join(" ")}
       style={{
         transform: !isActive && hovered && !prefersReduced ? "scale(1.03)" : "scale(1)",
@@ -307,7 +312,7 @@ export function Header() {
   // Mobile active link classes
   const mobileActiveClass = (href: string) =>
     isActive(href)
-      ? "border-l-[3px] border-accent-500 bg-accent-50 text-brand-600 font-semibold pl-3"
+      ? "border-l-[3px] border-accent-500 bg-white/10 text-white font-semibold pl-3"
       : "border-l-[3px] border-transparent pl-3";
 
   return (
@@ -316,11 +321,14 @@ export function Header() {
         className={[
           "fixed top-0 inset-x-0 z-50 transition-all duration-300",
           scrolled
-            ? "bg-white/90 backdrop-blur-md border-b border-card-border shadow-sm"
-            : "bg-transparent border-b border-transparent",
+            ? "bg-brand-800/95 backdrop-blur-xl shadow-[0_4px_24px_rgba(0,0,0,0.35)]"
+            : "bg-brand-800",
         ].join(" ")}
       >
-        <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+        {/* Gradient accent line at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent-500/50 to-transparent" />
+
+        <div className="max-w-5xl mx-auto px-4 h-[4.5rem] flex items-center justify-between gap-4">
           {/* Logo */}
           <Link
             href="/"
@@ -331,18 +339,20 @@ export function Header() {
               animate={{ scale: scrolled ? 0.95 : 1 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
             >
-              <PawPrint className="w-7 h-7 text-accent-500" aria-hidden="true" />
+              <CatLoveLogo size={36} />
             </motion.div>
             <span className="font-semibold text-xl tracking-tight" style={{ letterSpacing: "-0.4px" }}>
-              <span className="text-brand-600">Pet</span><span style={{ color: "#E67E22" }}>Border</span>
+              <span className="text-white">Pet</span><span style={{ color: "#E67E22" }}>Border</span>
             </span>
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden sm:flex items-center gap-1" aria-label="Main navigation">
+          <nav className="hidden sm:flex items-center gap-0.5" aria-label="Main navigation">
+            {/* Divider */}
+            <span className="w-px h-5 bg-white/15 mr-2" aria-hidden="true" />
             <a
               href="/#how-it-works"
-              className="relative text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors duration-150 px-2 py-1 whitespace-nowrap"
+              className="relative text-sm font-medium text-white/70 hover:text-white hover:bg-white/8 transition-all duration-150 px-3 py-1.5 rounded-lg whitespace-nowrap"
             >
               How it works
             </a>
@@ -375,12 +385,12 @@ export function Header() {
                     aria-expanded={userMenuOpen}
                     aria-haspopup="menu"
                     aria-label={`Account menu for ${displayName}`}
-                    className="flex items-center gap-2 rounded-xl px-3 py-1.5 hover:bg-gray-100 transition-colors"
+                    className="flex items-center gap-2 rounded-xl px-3 py-1.5 hover:bg-white/10 transition-colors"
                   >
                     <span className="w-7 h-7 rounded-full bg-brand-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
                       {avatarInitial}
                     </span>
-                    <span className="text-sm font-medium text-gray-700 max-w-[120px] truncate">
+                    <span className="text-sm font-medium text-white/90 max-w-[120px] truncate">
                       {displayName}
                     </span>
                     <svg
@@ -388,7 +398,7 @@ export function Header() {
                       width="14" height="14" viewBox="0 0 24 24"
                       fill="none" stroke="currentColor" strokeWidth="2"
                       strokeLinecap="round" strokeLinejoin="round"
-                      className={`text-gray-400 transition-transform duration-200 ${userMenuOpen ? "rotate-180" : ""}`}
+                      className={`text-white/50 transition-transform duration-200 ${userMenuOpen ? "rotate-180" : ""}`}
                       aria-hidden="true"
                     >
                       <polyline points="6 9 12 15 18 9"/>
@@ -449,13 +459,12 @@ export function Header() {
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.2 }}
                 >
-                  {/* Sign in — underline from centre */}
+                  {/* Sign in — ghost pill */}
                   <Link
                     href="/login"
-                    className="relative text-sm font-medium text-gray-600 hover:text-accent-500 transition-colors duration-200 group"
+                    className="text-sm font-medium text-white/80 hover:text-white border border-white/20 hover:border-white/40 hover:bg-white/8 px-4 py-2 rounded-lg transition-all duration-200"
                   >
                     Sign in
-                    <span className="absolute left-1/2 -translate-x-1/2 -bottom-0.5 h-0.5 w-0 rounded-full bg-accent-500 group-hover:w-full transition-all duration-200 ease-out" />
                   </Link>
 
                   {/* Get Started dropdown — with glow + arrow */}
@@ -468,7 +477,7 @@ export function Header() {
                       whileHover={prefersReduced ? {} : { scale: 1.02, boxShadow: "0 0 20px rgba(230, 126, 34, 0.35)" }}
                       whileTap={prefersReduced ? {} : { scale: 0.98 }}
                       transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                      className="inline-flex items-center gap-1.5 bg-accent-500 hover:bg-accent-600 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors min-h-[44px]"
+                      className="inline-flex items-center gap-1.5 bg-accent-500 hover:bg-accent-600 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors ring-1 ring-accent-400/40 min-h-[44px]"
                     >
                       Get Started
                       <motion.svg
@@ -517,20 +526,20 @@ export function Header() {
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
-            className="sm:hidden flex flex-col justify-center gap-1.5 w-10 h-10 rounded-lg hover:bg-gray-100 transition-colors p-2"
+            className="sm:hidden flex flex-col justify-center gap-1.5 w-10 h-10 rounded-lg hover:bg-white/10 transition-colors p-2"
           >
             <motion.span
-              className="block h-0.5 bg-gray-700 rounded origin-center"
+              className="block h-0.5 bg-white rounded origin-center"
               animate={menuOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
               transition={{ duration: 0.2 }}
             />
             <motion.span
-              className="block h-0.5 bg-gray-700 rounded"
+              className="block h-0.5 bg-white rounded"
               animate={menuOpen ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }}
               transition={{ duration: 0.15 }}
             />
             <motion.span
-              className="block h-0.5 bg-gray-700 rounded origin-center"
+              className="block h-0.5 bg-white rounded origin-center"
               animate={menuOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
               transition={{ duration: 0.2 }}
             />
@@ -549,7 +558,7 @@ export function Header() {
             exit={prefersReduced ? { opacity: 0 } : { opacity: 0, scaleY: 0.95 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
             style={{ originY: 0 }}
-            className="fixed inset-x-0 top-16 z-40 bg-white overflow-hidden sm:hidden border-b border-card-border shadow-lg"
+            className="fixed inset-x-0 top-[4.5rem] z-40 bg-brand-800 overflow-hidden sm:hidden border-b border-white/10 shadow-lg"
             role="navigation"
             aria-label="Mobile navigation"
           >
@@ -557,47 +566,47 @@ export function Header() {
               <a
                 href="/#how-it-works"
                 onClick={() => setMenuOpen(false)}
-                className="py-3 text-base font-medium text-gray-700 hover:text-brand-600 transition-colors border-l-[3px] border-transparent pl-3"
+                className="py-3 text-base font-medium text-white/70 hover:text-white transition-colors border-l-[3px] border-transparent pl-3"
               >
                 How it works
               </a>
-              <Link href="/generate" onClick={() => setMenuOpen(false)} className={`py-3 text-base font-medium text-gray-700 hover:text-brand-600 transition-colors ${mobileActiveClass("/generate")}`}>
+              <Link href="/generate" onClick={() => setMenuOpen(false)} className={`py-3 text-base font-medium text-white/70 hover:text-white transition-colors ${mobileActiveClass("/generate")}`}>
                 Moving to Australia
               </Link>
-              <Link href="/outbound" onClick={() => setMenuOpen(false)} className={`py-3 text-base font-medium text-gray-700 hover:text-accent-600 transition-colors ${mobileActiveClass("/outbound")}`}>
+              <Link href="/outbound" onClick={() => setMenuOpen(false)} className={`py-3 text-base font-medium text-white/70 hover:text-white transition-colors ${mobileActiveClass("/outbound")}`}>
                 Leaving Australia
               </Link>
-              <Link href="/dashboard/agencies" onClick={() => setMenuOpen(false)} className={`py-3 text-base font-medium text-gray-700 hover:text-brand-600 transition-colors ${mobileActiveClass("/dashboard/agencies")}`}>
+              <Link href="/dashboard/agencies" onClick={() => setMenuOpen(false)} className={`py-3 text-base font-medium text-white/70 hover:text-white transition-colors ${mobileActiveClass("/dashboard/agencies")}`}>
                 Compare Agencies
               </Link>
 
-              <div className="border-t border-gray-100 mt-2 pt-2 flex flex-col gap-0.5">
-                <Link href="/faq" onClick={() => setMenuOpen(false)} className={`py-2.5 text-sm font-medium text-gray-500 hover:text-brand-600 transition-colors ${mobileActiveClass("/faq")}`}>
+              <div className="border-t border-white/10 mt-2 pt-2 flex flex-col gap-0.5">
+                <Link href="/faq" onClick={() => setMenuOpen(false)} className={`py-2.5 text-sm font-medium text-white/50 hover:text-white transition-colors ${mobileActiveClass("/faq")}`}>
                   FAQ
                 </Link>
-                <Link href="/about" onClick={() => setMenuOpen(false)} className={`py-2.5 text-sm font-medium text-gray-500 hover:text-brand-600 transition-colors ${mobileActiveClass("/about")}`}>
+                <Link href="/about" onClick={() => setMenuOpen(false)} className={`py-2.5 text-sm font-medium text-white/50 hover:text-white transition-colors ${mobileActiveClass("/about")}`}>
                   About
                 </Link>
-                <Link href="/contact" onClick={() => setMenuOpen(false)} className={`py-2.5 text-sm font-medium text-gray-500 hover:text-brand-600 transition-colors ${mobileActiveClass("/contact")}`}>
+                <Link href="/contact" onClick={() => setMenuOpen(false)} className={`py-2.5 text-sm font-medium text-white/50 hover:text-white transition-colors ${mobileActiveClass("/contact")}`}>
                   Contact
                 </Link>
               </div>
 
               {user ? (
                 <>
-                  <div className="border-t border-gray-100 mt-2 pt-3 flex items-center gap-3">
+                  <div className="border-t border-white/10 mt-2 pt-3 flex items-center gap-3">
                     <span className="w-9 h-9 rounded-full bg-brand-600 text-white text-sm font-bold flex items-center justify-center flex-shrink-0">
                       {avatarInitial}
                     </span>
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-gray-800 truncate">{displayName}</p>
-                      <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                      <p className="text-sm font-semibold text-white truncate">{displayName}</p>
+                      <p className="text-xs text-white/50 truncate">{user.email}</p>
                     </div>
                   </div>
-                  <Link href="/dashboard" onClick={() => setMenuOpen(false)} className={`py-3 text-base font-semibold text-gray-800 hover:text-brand-600 transition-colors ${mobileActiveClass("/dashboard")}`}>
+                  <Link href="/dashboard" onClick={() => setMenuOpen(false)} className={`py-3 text-base font-semibold text-white hover:text-white/80 transition-colors ${mobileActiveClass("/dashboard")}`}>
                     My Dashboard
                   </Link>
-                  <Link href="/dashboard/timelines" onClick={() => setMenuOpen(false)} className={`py-3 text-base font-semibold text-gray-800 hover:text-brand-600 transition-colors ${mobileActiveClass("/dashboard/timelines")}`}>
+                  <Link href="/dashboard/timelines" onClick={() => setMenuOpen(false)} className={`py-3 text-base font-semibold text-white hover:text-white/80 transition-colors ${mobileActiveClass("/dashboard/timelines")}`}>
                     My Timelines
                   </Link>
                   <div className="pt-3 pb-2">
@@ -607,8 +616,8 @@ export function Header() {
                       className={[
                         "flex items-center justify-center gap-2 border text-base font-semibold px-6 py-3.5 rounded-2xl transition-colors w-full",
                         signOutPending
-                          ? "border-red-300 bg-red-50 text-red-600"
-                          : "border-card-border text-gray-700 hover:bg-gray-50",
+                          ? "border-red-400 bg-red-900/30 text-red-300"
+                          : "border-white/20 text-white/70 hover:bg-white/10",
                       ].join(" ")}
                     >
                       <LogOutIcon />
@@ -618,7 +627,7 @@ export function Header() {
                 </>
               ) : (
                 <>
-                  <Link href="/login" onClick={() => setMenuOpen(false)} className="py-3 text-base font-semibold text-gray-800 border-t border-gray-100 hover:text-brand-600 transition-colors border-l-[3px] border-transparent pl-3 mt-2">
+                  <Link href="/login" onClick={() => setMenuOpen(false)} className="py-3 text-base font-semibold text-white border-t border-white/10 hover:text-white/80 transition-colors border-l-[3px] border-l-transparent pl-3 mt-2">
                     Sign in
                   </Link>
                   <div className="pt-3 pb-2 flex flex-col gap-3">
@@ -647,7 +656,7 @@ export function Header() {
       </AnimatePresence>
 
       {/* Spacer */}
-      <div className="h-16" aria-hidden="true" />
+      <div className="h-[4.5rem]" aria-hidden="true" />
 
       {/* Toast */}
       <Toast message={toast.message} visible={toast.visible} />

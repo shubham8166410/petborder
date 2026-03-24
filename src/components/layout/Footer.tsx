@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PawPrint } from "@/components/icons/PawPrint";
+import { LottiePawLogo } from "@/components/icons/LottiePawLogo";
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -12,7 +12,7 @@ export function Footer() {
           {/* Brand */}
           <div className="flex flex-col gap-3 col-span-2 lg:col-span-1">
             <div className="flex items-center gap-2">
-              <PawPrint className="w-6 h-6 text-accent-500" aria-hidden="true" />
+              <LottiePawLogo size={28} />
               <span className="font-semibold text-lg tracking-tight" style={{ letterSpacing: "-0.4px" }}>
                 <span className="text-white">Pet</span><span style={{ color: "#E67E22" }}>Border</span>
               </span>

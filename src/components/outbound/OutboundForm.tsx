@@ -8,7 +8,12 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Alert } from "@/components/ui/Alert";
 import { StepIndicator } from "@/components/ui/StepIndicator";
-import { LottiePawSpinner } from "@/components/icons/LottiePawSpinner";
+import dynamic from "next/dynamic";
+
+const LottiePawSpinner = dynamic(
+  () => import("@/components/icons/LottiePawSpinner").then((m) => ({ default: m.LottiePawSpinner })),
+  { ssr: false }
+);
 import { OutboundTimelineResult } from "./OutboundTimelineResult";
 
 // ── Country flag helper ──────────────────────────────────────────────────────
