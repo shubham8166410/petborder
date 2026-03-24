@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Navy background circle -->
+  <circle cx="16" cy="16" r="16" fill="#1B4F72"/>
+
+  <!-- Passport (centre, simplified) -->
+  <rect x="12" y="8" width="8" height="11" rx="1" fill="#154060"/>
+  <rect x="12" y="8" width="1.5" height="11" rx="0.5" fill="#0E2D42"/>
+  <circle cx="16" cy="12" r="2.5" fill="#E67E22"/>
+  <polyline points="14.5,12 15.5,13.2 17.5,11" stroke="white" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Dog (left, simplified) -->
+  <!-- Head -->
+  <circle cx="8" cy="13" r="4.5" fill="#E8A87C"/>
+  <!-- Ear -->
+  <ellipse cx="5.5" cy="15" rx="2" ry="3" fill="#D4855A" transform="rotate(-15,5.5,15)"/>
+  <!-- Eye -->
+  <circle cx="7" cy="12" r="1.2" fill="white"/>
+  <circle cx="7" cy="12" r="0.8" fill="#2C1810"/>
+  <!-- Nose -->
+  <ellipse cx="8.5" cy="14" rx="1.2" ry="0.9" fill="#2C1810"/>
+
+  <!-- Cat (right, simplified) -->
+  <!-- Ear -->
+  <polygon points="24,10 26,6.5 28,10" fill="#9B8EE0"/>
+  <!-- Head -->
+  <circle cx="25.5" cy="13" r="4.5" fill="#9B8EE0"/>
+  <!-- Eye -->
+  <circle cx="24" cy="12" r="1.2" fill="white"/>
+  <ellipse cx="24" cy="12" rx="0.5" ry="1" fill="#2C6B2F"/>
+  <!-- Nose -->
+  <polygon points="25.5,14.2 24.8,15.2 26.2,15.2" fill="#E8A4C8"/>
+</svg>

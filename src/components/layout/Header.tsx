@@ -2,26 +2,11 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
-import { PawPrint } from "@/components/icons/PawPrint";
+import { PetBorderLogo } from "@/components/ui/PetBorderLogo";
 import type { User } from "@supabase/supabase-js";
-
-// Animated logo paw — SSR-safe via dynamic import
-const LogoPaw = dynamic(
-  () =>
-    import("@/components/icons/LottiePawSpinner").then(
-      (m) => m.LottiePawSpinner
-    ),
-  {
-    ssr: false,
-    loading: () => (
-      <PawPrint className="w-7 h-7 text-accent-500" aria-hidden="true" />
-    ),
-  }
-);
 
 // ── Icons ──────────────────────────────────────────────────────────────────
 
@@ -346,11 +331,8 @@ export function Header() {
               animate={{ scale: scrolled ? 0.95 : 1 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
             >
-              <LogoPaw size={36} />
+              <PetBorderLogo size="md" showWordmark={true} />
             </motion.div>
-            <span className="font-extrabold text-xl text-brand-600 tracking-tight">
-              PetBorder
-            </span>
           </Link>
 
           {/* Desktop nav */}
