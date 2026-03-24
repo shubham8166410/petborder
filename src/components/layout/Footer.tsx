@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PetBorderLogo } from "@/components/ui/PetBorderLogo";
+import { PawPrint } from "@/components/icons/PawPrint";
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -11,7 +11,12 @@ export function Footer() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 pb-8 border-b border-white/10">
           {/* Brand */}
           <div className="flex flex-col gap-3 col-span-2 lg:col-span-1">
-            <PetBorderLogo size="lg" showWordmark={true} darkMode={true} />
+            <div className="flex items-center gap-2">
+              <PawPrint className="w-6 h-6 text-accent-500" aria-hidden="true" />
+              <span className="font-semibold text-lg tracking-tight" style={{ letterSpacing: "-0.4px" }}>
+                <span className="text-white">Pet</span><span style={{ color: "#E67E22" }}>Border</span>
+              </span>
+            </div>
             <p className="text-sm text-white/60 leading-relaxed max-w-xs">
               Australia&apos;s pet travel compliance planner. Built for pet owners navigating DAFF regulations.
             </p>

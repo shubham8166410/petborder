@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
-import { PetBorderLogo } from "@/components/ui/PetBorderLogo";
+import { PawPrint } from "@/components/icons/PawPrint";
 import type { User } from "@supabase/supabase-js";
 
 // ── Icons ──────────────────────────────────────────────────────────────────
@@ -331,8 +331,11 @@ export function Header() {
               animate={{ scale: scrolled ? 0.95 : 1 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
             >
-              <PetBorderLogo size="md" showWordmark={true} />
+              <PawPrint className="w-7 h-7 text-accent-500" aria-hidden="true" />
             </motion.div>
+            <span className="font-semibold text-xl tracking-tight" style={{ letterSpacing: "-0.4px" }}>
+              <span className="text-brand-600">Pet</span><span style={{ color: "#E67E22" }}>Border</span>
+            </span>
           </Link>
 
           {/* Desktop nav */}
