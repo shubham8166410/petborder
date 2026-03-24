@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { NavigationProgress } from "@/components/layout/NavigationProgress";
+import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
@@ -92,6 +93,7 @@ export default function RootLayout({
       className={`${plusJakarta.variable} ${geistMono.variable} h-full`}
     >
       <body className="min-h-full flex flex-col bg-surface text-gray-900 antialiased overflow-x-hidden">
+        <GoogleAnalytics />
         <NavigationProgress />
         {children}
       </body>
