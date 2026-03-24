@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "postbuild": "next-sitemap",
+    "generate-og": "node scripts/generate-og-image.mjs",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest",

@@ -55,6 +55,7 @@ module.exports = {
     "/api/vets",
     "/api/webhook",
     "/api/webhook/*",
+    "/api/og",
   ],
 
   robotsTxtOptions: {
@@ -83,9 +84,15 @@ module.exports = {
       "/generate": 0.9,
       "/outbound": 0.9,
       "/faq": 0.8,
+      "/guides/bringing-dog-to-australia": 0.85,
+      "/guides/pet-import-cost-australia": 0.85,
+      "/guides/australia-pet-quarantine": 0.85,
+      "/guides/moving-to-australia-from-uk-with-pet": 0.85,
       "/about": 0.7,
       "/contact": 0.6,
       "/api/docs": 0.6,
+      "/privacy": 0.4,
+      "/terms": 0.4,
     };
 
     const changeFrequencies = {
@@ -93,9 +100,15 @@ module.exports = {
       "/generate": "monthly",
       "/outbound": "monthly",
       "/faq": "monthly",
+      "/guides/bringing-dog-to-australia": "monthly",
+      "/guides/pet-import-cost-australia": "monthly",
+      "/guides/australia-pet-quarantine": "monthly",
+      "/guides/moving-to-australia-from-uk-with-pet": "monthly",
       "/about": "monthly",
       "/contact": "yearly",
       "/api/docs": "weekly",
+      "/privacy": "yearly",
+      "/terms": "yearly",
     };
 
     return {

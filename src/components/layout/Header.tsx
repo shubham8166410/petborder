@@ -367,6 +367,9 @@ export function Header() {
             <NavLink href="/outbound" isActive={isActive("/outbound")} prefersReduced={prefersReduced}>
               Leaving Australia
             </NavLink>
+            <NavLink href="/about" isActive={isActive("/about")} prefersReduced={prefersReduced}>
+              About
+            </NavLink>
 
             {/* Auth section */}
             <div className="ml-2 flex items-center gap-3">
