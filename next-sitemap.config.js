@@ -58,6 +58,16 @@ module.exports = {
     "/api/og",
   ],
 
+  // Explicitly add pages that next-sitemap doesn't auto-discover with Next.js 16 App Router
+  additionalPaths: async (config) => [
+    await config.transform(config, "/guides/bringing-dog-to-australia"),
+    await config.transform(config, "/guides/pet-import-cost-australia"),
+    await config.transform(config, "/guides/australia-pet-quarantine"),
+    await config.transform(config, "/guides/moving-to-australia-from-uk-with-pet"),
+    await config.transform(config, "/privacy"),
+    await config.transform(config, "/terms"),
+  ],
+
   robotsTxtOptions: {
     policies: [
       {
