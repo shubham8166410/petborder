@@ -31,13 +31,8 @@ const nextConfig: NextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         ],
       },
-      {
-        // Long-lived cache for static assets (Next.js hashes these filenames)
-        source: "/_next/static/:path*",
-        headers: [
-          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
-        ],
-      },
+      // Note: /_next/static omitted — Next.js manages its own Cache-Control
+      // for static chunks; overriding it breaks dev HMR.
       {
         source: "/fonts/:path*",
         headers: [

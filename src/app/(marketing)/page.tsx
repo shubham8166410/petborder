@@ -77,7 +77,7 @@ export default function LandingPage() {
       <Header />
 
       <main className="flex-1">
-        {/* ── Hero ──────────────────────────────────────────────────────────── */}
+        {/* -- Hero -- */}
         <section className="bg-paw-pattern bg-surface px-4 pt-10 pb-16 sm:pt-14 sm:pb-20">
           <div className="max-w-5xl mx-auto">
             <div className="flex flex-col-reverse lg:grid lg:grid-cols-[3fr_2fr] gap-8 lg:gap-10 items-center">
@@ -130,7 +130,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── Trust bar ─────────────────────────────────────────────────────── */}
+        {/* -- Trust bar -- */}
         <section className="border-y border-card-border bg-white px-4 py-5" aria-label="Key features">
           <div className="max-w-4xl mx-auto flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm font-medium text-gray-600">
             {[
@@ -146,7 +146,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── Direction picker ──────────────────────────────────────────────── */}
+        {/* -- Direction picker -- */}
         <section className="px-4 py-12 max-w-4xl mx-auto">
           <div className="text-center mb-6">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Bringing a pet in, or taking one out?</h2>
@@ -205,7 +205,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── How it works ──────────────────────────────────────────────────── */}
+        {/* -- How it works -- */}
         <section id="how-it-works" className="px-4 py-16 max-w-4xl mx-auto scroll-mt-20">
           <div className="text-center mb-10">
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">How it works</h2>
@@ -251,7 +251,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── Country groups table ───────────────────────────────────────────── */}
+        {/* -- Country groups table -- */}
         <section className="bg-white border-y border-card-border px-4 py-16">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-8">
@@ -322,7 +322,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── FAQ ────────────────────────────────────────────────────────────── */}
+        {/* -- FAQ -- */}
         <section id="faq" className="px-4 py-16 scroll-mt-20">
           <div className="max-w-2xl mx-auto">
             <div className="text-center mb-8">
@@ -353,7 +353,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── Final CTA ─────────────────────────────────────────────────────── */}
+        {/* -- Final CTA -- */}
         <section className="bg-brand-600 px-4 py-14 text-center">
           <div className="max-w-xl mx-auto flex flex-col items-center gap-4">
             <PawPrint className="w-10 h-10 text-accent-500" aria-hidden="true" />
