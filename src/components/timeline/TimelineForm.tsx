@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Alert } from "@/components/ui/Alert";
 import { StepIndicator } from "@/components/ui/StepIndicator";
+import { ComboboxBreed, detectBannedBreed } from "@/components/ui/ComboboxBreed";
 import dynamic from "next/dynamic";
 
 const LottiePawSpinner = dynamic(
@@ -26,21 +27,6 @@ function getCountryFlag(code: string): string {
     .map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
     .join("");
 }
-
-// ── Common breed suggestions ────────────────────────────────────────────────
-const DOG_BREEDS = [
-  "Labrador Retriever","Golden Retriever","German Shepherd","French Bulldog",
-  "Bulldog","Poodle","Beagle","Rottweiler","Dachshund","Shih Tzu",
-  "Border Collie","Siberian Husky","Boxer","Maltese","Cavalier King Charles Spaniel",
-  "Cocker Spaniel","Great Dane","Doberman Pinscher","Miniature Schnauzer","Mixed breed",
-];
-
-const CAT_BREEDS = [
-  "Domestic Shorthair","Domestic Longhair","Maine Coon","Persian","Siamese",
-  "Ragdoll","British Shorthair","Sphynx","Scottish Fold","Russian Blue",
-  "American Shorthair","Abyssinian","Birman","Norwegian Forest Cat","Devon Rex",
-  "Burmese","Oriental Shorthair","Mixed breed",
-];
 
 // ── State ───────────────────────────────────────────────────────────────────
 interface FormState {
@@ -91,10 +77,6 @@ function reducer(state: FormState, action: FormAction): FormState {
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
-function isBengalCat(petType: PetType | null, breed: string): boolean {
-  return petType === "cat" && /bengal/i.test(breed);
-}
-
 function getTodayStr(): string {
   return new Date().toISOString().split("T")[0];
 }
@@ -261,10 +243,14 @@ export function TimelineForm({ onResult }: TimelineFormProps = {}) {
     icon: getCountryFlag(c.code),
   }));
 
+  const isBanned = state.petType
+    ? !!detectBannedBreed(state.petType, state.petBreed)
+    : false;
+
   const canGoToStep2 = state.petType !== null &&
     state.petBreed.trim().length > 0 &&
     state.petBreed.trim().length <= 100 &&
-    !isBengalCat(state.petType, state.petBreed);
+    !isBanned;
 
   const canGoToStep3 = state.originCountry !== "";
   const canSubmit = state.travelDate !== "";
@@ -331,11 +317,7 @@ export function TimelineForm({ onResult }: TimelineFormProps = {}) {
     return <LottiePawSpinner withMessages size={140} />;
   }
 
-  const bengalWarning = isBengalCat(state.petType, state.petBreed);
   const selectedCountry = countries.find((c) => c.code === state.originCountry);
-
-  const breedListId = "breed-suggestions";
-  const breedSuggestions = state.petType === "cat" ? CAT_BREEDS : DOG_BREEDS;
 
   return (
     <div className="flex flex-col gap-6 w-full">
@@ -384,31 +366,16 @@ export function TimelineForm({ onResult }: TimelineFormProps = {}) {
           </fieldset>
 
           {/* Breed input */}
-          <div>
-            <Input
-              id="pet-breed"
-              listId={breedListId}
-              label="Breed"
-              placeholder={state.petType === "cat" ? "e.g. Domestic Shorthair" : "e.g. Labrador Retriever"}
-              value={state.petBreed}
-              onChange={(e) => dispatch({ type: "SET_PET_BREED", breed: e.target.value })}
-              maxLength={100}
-              required
-              hint={state.petBreed.length === 0 ? "Start typing for suggestions" : undefined}
-              error={bengalWarning ? "Bengal cats are banned from import to Australia as of March 2026." : undefined}
-            />
-            <datalist id={breedListId}>
-              {breedSuggestions.map((breed) => (
-                <option key={breed} value={breed} />
-              ))}
-            </datalist>
-          </div>
-
-          {bengalWarning && (
-            <Alert severity="critical">
-              Bengal cats are banned from import to Australia under DAFF regulations (effective March 2026). Unfortunately, this breed cannot be brought into the country.
-            </Alert>
-          )}
+          <ComboboxBreed
+            id="pet-breed"
+            petType={state.petType ?? "dog"}
+            label="Breed"
+            placeholder={state.petType === "cat" ? "e.g. Domestic Shorthair" : "e.g. Labrador Retriever"}
+            value={state.petBreed}
+            onChange={(breed) => dispatch({ type: "SET_PET_BREED", breed })}
+            required
+            hint={state.petBreed.length === 0 ? "Type to search or enter a custom breed" : undefined}
+          />
 
           <Button
             onClick={() => dispatch({ type: "NEXT_STEP" })}

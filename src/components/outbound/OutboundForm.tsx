@@ -6,6 +6,7 @@ import type { OutboundTimelineResponse } from "@/lib/outbound-schema";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { ComboboxBreed } from "@/components/ui/ComboboxBreed";
 import { Alert } from "@/components/ui/Alert";
 import { StepIndicator } from "@/components/ui/StepIndicator";
 import dynamic from "next/dynamic";
@@ -25,20 +26,6 @@ function getCountryFlag(code: string): string {
     .map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
     .join("");
 }
-
-// ── Common breeds ────────────────────────────────────────────────────────────
-const DOG_BREEDS = [
-  "Labrador Retriever", "Golden Retriever", "German Shepherd", "French Bulldog",
-  "Bulldog", "Poodle", "Beagle", "Rottweiler", "Dachshund", "Shih Tzu",
-  "Border Collie", "Siberian Husky", "Boxer", "Maltese", "Cavalier King Charles Spaniel",
-  "Cocker Spaniel", "Mixed breed",
-];
-
-const CAT_BREEDS = [
-  "Domestic Shorthair", "Domestic Longhair", "Maine Coon", "Persian", "Siamese",
-  "Ragdoll", "British Shorthair", "Sphynx", "Scottish Fold", "Russian Blue",
-  "American Shorthair", "Burmese", "Mixed breed",
-];
 
 // ── Lead-time warning ────────────────────────────────────────────────────────
 const LONG_LEAD_TIME_CODES = new Set(["JP", "SG"]); // 6+ months required
@@ -210,7 +197,6 @@ export function OutboundForm() {
 
   const today = getTodayStr();
   const maxDate = getMaxDateStr();
-  const breeds = state.petType === "cat" ? CAT_BREEDS : DOG_BREEDS;
 
   const selectedDestination = DESTINATION_COUNTRIES.find(
     (c) => c.code === state.destinationCountry
@@ -336,24 +322,15 @@ export function OutboundForm() {
           </div>
 
           {state.petType && (
-            <div>
-              <label htmlFor="outbound-breed" className="block text-sm font-semibold text-gray-700 mb-1">
-                Breed
-              </label>
-              <Input
-                id="outbound-breed"
-                list="outbound-breed-list"
-                value={state.petBreed}
-                onChange={(e) => dispatch({ type: "SET_PET_BREED", breed: e.target.value })}
-                placeholder={`e.g. ${breeds[0]}`}
-                maxLength={100}
-              />
-              <datalist id="outbound-breed-list">
-                {breeds.map((b) => (
-                  <option key={b} value={b} />
-                ))}
-              </datalist>
-            </div>
+            <ComboboxBreed
+              id="outbound-breed"
+              petType={state.petType}
+              label="Breed"
+              placeholder={`e.g. ${state.petType === "cat" ? "Domestic Shorthair" : "Labrador Retriever"}`}
+              value={state.petBreed}
+              onChange={(breed) => dispatch({ type: "SET_PET_BREED", breed })}
+              hint={state.petBreed.length === 0 ? "Type to search or enter a custom breed" : undefined}
+            />
           )}
 
           {state.petType && state.petBreed.trim().length > 0 && (
