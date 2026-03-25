@@ -150,7 +150,7 @@ function addDays(base: string, days: number): string {
 // ── Pet icons (reused from TimelineForm) ─────────────────────────────────────
 function DogIcon({ active }: { active: boolean }) {
   return (
-    <svg viewBox="0 0 64 64" className="w-12 h-12" fill="none" aria-hidden="true">
+    <svg viewBox="0 0 64 64" className="w-10 h-10 sm:w-12 sm:h-12" fill="none" aria-hidden="true">
       <ellipse cx="32" cy="44" rx="20" ry="14" fill={active ? "#1B4F72" : "#D1D5DB"} />
       <circle cx="32" cy="24" r="14" fill={active ? "#1B4F72" : "#D1D5DB"} />
       <ellipse cx="22" cy="14" rx="6" ry="10" fill={active ? "#154360" : "#9CA3AF"} transform="rotate(-15 22 14)" />
@@ -167,7 +167,7 @@ function DogIcon({ active }: { active: boolean }) {
 
 function CatIcon({ active }: { active: boolean }) {
   return (
-    <svg viewBox="0 0 64 64" className="w-12 h-12" fill="none" aria-hidden="true">
+    <svg viewBox="0 0 64 64" className="w-10 h-10 sm:w-12 sm:h-12" fill="none" aria-hidden="true">
       <ellipse cx="32" cy="46" rx="18" ry="12" fill={active ? "#1B4F72" : "#D1D5DB"} />
       <circle cx="32" cy="26" r="16" fill={active ? "#1B4F72" : "#D1D5DB"} />
       <polygon points="18,16 14,4 26,12" fill={active ? "#154360" : "#9CA3AF"} />
@@ -312,7 +312,7 @@ export function OutboundForm() {
                   className={[
                     "flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all",
                     state.petType === type
-                      ? "border-brand-500 bg-brand-50"
+                      ? "border-brand-600 bg-brand-50"
                       : "border-card-border hover:border-brand-200",
                   ].join(" ")}
                   aria-pressed={state.petType === type}
@@ -373,7 +373,7 @@ export function OutboundForm() {
                     className={[
                       "px-4 py-3 rounded-2xl border-2 text-sm font-medium transition-all text-left",
                       state.isAlreadyMicrochipped === value
-                        ? "border-brand-500 bg-brand-50 text-brand-700"
+                        ? "border-brand-600 bg-brand-50 text-brand-700"
                         : "border-card-border hover:border-brand-200 text-gray-600",
                     ].join(" ")}
                     aria-pressed={state.isAlreadyMicrochipped === value}

@@ -51,6 +51,12 @@ body {
 button,
 a {
   -webkit-tap-highlight-color: transparent;
+  /* Prevent iOS from interpreting taps as scroll gestures.
+     Without this, a finger that moves even 1px during a tap causes
+     iOS Safari to cancel the synthetic click event entirely,
+     making buttons appear unresponsive. */
+  touch-action: manipulation;
+  cursor: pointer;
 }
 
 /* Prevent iOS from auto-zooming when inputs smaller than 16px are focused.
