@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { ComboboxBreed } from "@/components/ui/ComboboxBreed";
+import { BreedChecker } from "@/components/ui/BreedChecker";
 import { Alert } from "@/components/ui/Alert";
 import { StepIndicator } from "@/components/ui/StepIndicator";
 import dynamic from "next/dynamic";
@@ -410,6 +411,16 @@ export function OutboundForm() {
             <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-3">
               We have general guidance for {selectedDestination.name}. Your timeline will show all Australian export requirements plus a recommendation to verify destination requirements with {selectedDestination.name}&apos;s official animal import authority.
             </div>
+          )}
+
+          {/* Inline breed restriction check — runs automatically once breed + destination are known */}
+          {state.petType && state.petBreed.trim().length > 0 && state.destinationCountry && (
+            <BreedChecker
+              breed={state.petBreed.trim()}
+              countryCode={state.destinationCountry}
+              petType={state.petType}
+              mode="inline"
+            />
           )}
 
           <div className="flex gap-3">

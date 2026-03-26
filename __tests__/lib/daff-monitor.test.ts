@@ -77,14 +77,23 @@ describe('stripBoilerplate', () => {
 });
 
 describe('DAFF_MONITORED_PAGES', () => {
-  it('has exactly 7 entries (4 inbound + 3 outbound)', () => {
-    expect(DAFF_MONITORED_PAGES).toHaveLength(7);
+  it('has exactly 9 entries (4 inbound + 3 outbound + 2 breed restriction)', () => {
+    expect(DAFF_MONITORED_PAGES).toHaveLength(9);
   });
 
-  it('all entries start with https://www.agriculture.gov.au', () => {
-    for (const url of DAFF_MONITORED_PAGES) {
+  it('DAFF entries start with https://www.agriculture.gov.au', () => {
+    const daffPages = DAFF_MONITORED_PAGES.filter((url) =>
+      url.includes('agriculture.gov.au')
+    );
+    expect(daffPages).toHaveLength(7);
+    for (const url of daffPages) {
       expect(url).toMatch(/^https:\/\/www\.agriculture\.gov\.au/);
     }
+  });
+
+  it('breed restriction entries are present', () => {
+    expect(DAFF_MONITORED_PAGES).toContain('https://www.gov.uk/control-dog-public');
+    expect(DAFF_MONITORED_PAGES).toContain('https://www.mpi.govt.nz');
   });
 });
 
