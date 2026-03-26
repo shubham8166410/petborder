@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect, useId } from "react";
+import { useState, useRef, useEffect, useId, useCallback } from "react";
+import { getBreedsFromCache, refreshBreedsCache, type CachedBreedEntry } from "@/lib/breeds-cache";
 
 // ── Breed data ────────────────────────────────────────────────────────────────
 // banned: true = cannot enter Australia under DAFF biosecurity law
@@ -394,7 +395,32 @@ export function ComboboxBreed({
   const inputId = id ?? `combobox-breed-${uid}`;
   const listId = `${inputId}-list`;
 
-  const breedData = petType === "cat" ? CAT_BREED_DATA : DOG_BREED_DATA;
+  // Start with bundled data (zero latency), swap silently to DB data when ready
+  const bundled = petType === "cat" ? CAT_BREED_DATA : DOG_BREED_DATA;
+  const [breedData, setBreedData] = useState<BreedEntry[]>(bundled);
+
+  // Normalise a CachedBreedEntry (from DB/localStorage) into a BreedEntry
+  const fromCached = useCallback((entries: CachedBreedEntry[]): BreedEntry[] =>
+    entries.map((e) => ({
+      name: e.name,
+      ...(e.banned ? { banned: true as const, bannedNote: e.banned_note ?? undefined } : {}),
+    })), []);
+
+  // On mount: check localStorage first, then fetch from API if stale
+  useEffect(() => {
+    const cached = getBreedsFromCache(petType);
+    if (cached) {
+      setBreedData(fromCached(cached));
+      return;
+    }
+    // Cache miss or stale — fetch from API in background, no loading state
+    refreshBreedsCache().then((envelope) => {
+      if (!envelope) return; // API unreachable, keep bundled data
+      const entries = petType === "cat" ? envelope.cat : envelope.dog;
+      setBreedData(fromCached(entries));
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [petType]);
 
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
