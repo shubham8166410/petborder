@@ -142,7 +142,7 @@ function addDays(base: string, days: number): string {
 function PetLottieIcon({ petType, active }: { petType: "dog" | "cat"; active: boolean }) {
   return (
     <div
-      className="w-14 h-14 sm:w-16 sm:h-16"
+      className="w-20 h-20 sm:w-24 sm:h-24"
       style={{
         filter: active ? "none" : "grayscale(100%) opacity(0.4)",
         transition: "filter 200ms ease",
@@ -311,7 +311,7 @@ export function OutboundForm() {
               placeholder={`e.g. ${state.petType === "cat" ? "Domestic Shorthair" : "Labrador Retriever"}`}
               value={state.petBreed}
               onChange={(breed) => dispatch({ type: "SET_PET_BREED", breed })}
-              hint={state.petBreed.length === 0 ? "Type to search or enter a custom breed" : undefined}
+              hint={state.petBreed.length === 0 ? "Type to search, then select from the list" : undefined}
               hideBanWarnings
             />
           )}
