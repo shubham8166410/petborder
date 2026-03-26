@@ -24,6 +24,9 @@ export const DAFF_MONITORED_PAGES = [
   'https://www.agriculture.gov.au/biosecurity-trade/export/controlled-goods/live-animals/companion-and-other-live-animals',
   'https://www.agriculture.gov.au/biosecurity-trade/export/controlled-goods/live-animals/companion-and-other-live-animals/lodging-notice-of-intention',
   'https://www.agriculture.gov.au/biosecurity-trade/export/controlled-goods/live-animals/companion-and-other-live-animals/export-permit',
+  // ── Breed restriction pages (key destination countries) ────────────────────
+  'https://www.gov.uk/control-dog-public',
+  'https://www.mpi.govt.nz',
 ] as const;
 
 /**

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import type { TimelineOutput } from "@/types/timeline";
 import type { AgencyRow } from "@/types/database";
 import type { QuarantineAvailability } from "@/lib/mickleham";
@@ -171,6 +172,7 @@ function handleEmailSelf(result: TimelineOutput) {
 }
 
 export function TimelineResult({ result, savedTimelineId, onReset }: TimelineResultProps) {
+  const pathname = usePathname();
   const group = groupInfo[result.originGroup];
   const criticalWarnings = result.warnings.filter((w) => w.severity === "critical");
   const otherWarnings = result.warnings.filter((w) => w.severity !== "critical");
@@ -339,7 +341,7 @@ export function TimelineResult({ result, savedTimelineId, onReset }: TimelineRes
           </Link>
         ) : (
           <Link
-            href="/login"
+            href={`/login?redirectTo=${encodeURIComponent(pathname)}`}
             className="inline-flex items-center gap-2 text-sm font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 border border-brand-100 px-4 py-2.5 rounded-xl transition-colors min-h-[44px]"
             aria-label="Sign in to save this timeline and get the PDF"
           >

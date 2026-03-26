@@ -33,6 +33,9 @@ export function Footer() {
             <Link href="/outbound" className="text-sm text-white/70 hover:text-white transition-colors">
               Leaving Australia
             </Link>
+            <Link href="/tools/breed-checker" className="text-sm text-white/70 hover:text-white transition-colors">
+              Breed Checker
+            </Link>
             <a href="/#how-it-works" className="text-sm text-white/70 hover:text-white transition-colors">
               How it works
             </a>
