@@ -9,6 +9,7 @@ import { Select } from "@/components/ui/Select";
 import { Alert } from "@/components/ui/Alert";
 import { StepIndicator } from "@/components/ui/StepIndicator";
 import { ComboboxBreed, detectBannedBreed } from "@/components/ui/ComboboxBreed";
+import { createClient } from "@/lib/supabase/client";
 import dynamic from "next/dynamic";
 import Lottie from "lottie-react";
 import dogAnimData from "@/assets/animations/dog icon.json";
@@ -210,6 +211,50 @@ export function TimelineForm({ onResult }: TimelineFormProps = {}) {
   }
 
   useEffect(() => { fetchCountries(); }, []);
+
+  // ── Pending timeline: persist for unauthenticated users so it survives login ──
+
+  const PENDING_KEY = "petborder_pending_timeline";
+
+  // Store inputs + result in sessionStorage whenever a result exists but isn't saved
+  // (user isn't logged in yet). Cleared once we successfully save after login.
+  useEffect(() => {
+    if (!state.result || state.savedTimelineId) return;
+    createClient().auth.getUser().then(({ data }) => {
+      if (data.user) return; // logged in — the save call handles it
+      if (!state.petType) return;
+      sessionStorage.setItem(PENDING_KEY, JSON.stringify({
+        input: { petType: state.petType, petBreed: state.petBreed, originCountry: state.originCountry, travelDate: state.travelDate },
+        result: state.result,
+      }));
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.result]);
+
+  // On mount: if user just logged in and there's a pending timeline, restore + save it
+  useEffect(() => {
+    const stored = sessionStorage.getItem(PENDING_KEY);
+    if (!stored) return;
+    createClient().auth.getUser().then(({ data }) => {
+      if (!data.user) return; // still not logged in
+      try {
+        const { input, result } = JSON.parse(stored) as { input: TimelineInput; result: TimelineOutput };
+        sessionStorage.removeItem(PENDING_KEY);
+        dispatch({ type: "SUBMIT_SUCCESS", result });
+        fetch("/api/timelines", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ input, output: result }),
+        })
+          .then(async (r) => { if (r.ok) return r.json(); return null; })
+          .then((saved) => { if (saved?.id) dispatch({ type: "SET_SAVED_ID", id: saved.id }); })
+          .catch(() => {});
+      } catch {
+        sessionStorage.removeItem(PENDING_KEY);
+      }
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Notify parent when a result is available (fires once on initial result, then when savedId is set)
   useEffect(() => {
